@@ -1,8 +1,11 @@
-# koishi-plugin-adapter-onebot
+# koishi-plugin-adapter-napcat
 
-适用于 [Koishi](https://koishi.chat/) 的 OneBot 适配器。
+适用于 [Koishi](https://koishi.chat/) 的 NapCat 适配器（基于 [`koishi-plugin-adapter-onebot`](https://github.com/koishijs/koishi-plugin-adapter-onebot)）。
 
+[NapCat](https://github.com/NapNeko/NapCatQQ) 是现代化的基于 NTQQ 的 OneBot 协议端实现，
 [OneBot](https://github.com/howmanybots/onebot) 是一个聊天机器人应用接口标准。
+
+分支出本适配器的目的是使 Koishi 用户能够利用 [NapCat 所支持的特有 API](#napcat-特有-api)。由于本人精力有限，本适配器实现的 NapCat 特有 API 可能出现不全、过时等现象，请理解。
 
 ## 配置项
 
@@ -126,6 +129,10 @@
 - [`onebot.setModelShow()`](https://docs.go-cqhttp.org/api/#设置在线机型)
 - [`onebot.delete_unidirectional_friend()`](https://docs.go-cqhttp.org/api/#删除单向好友)
 - [`onebot.send_private_forward_msg()`](https://docs.go-cqhttp.org/api/#发送合并转发-好友)
+
+### NapCat 特有 API
+
+- [`onebot.getGroupMsgHistory(..., reverse_order?, count?)`](https://napcat.apifox.cn/226657401e0)：通过 `reverse_order` 参数，可以指定消息获取方向，并以此实现分页获取历史消息；`count` 参数可以指定获取消息条数
 
 ### 频道 API
 
