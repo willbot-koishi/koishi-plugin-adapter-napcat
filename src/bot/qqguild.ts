@@ -1,17 +1,17 @@
 import { Context, Universal } from 'koishi'
 import { BaseBot } from './base'
-import { OneBotBot } from '.'
+import { NapCatBot } from '.'
 import * as OneBot from '../utils'
 
 export namespace QQGuildBot {
   export interface Config extends BaseBot.Config {
-    parent: OneBotBot<Context>
+    parent: NapCatBot<Context>
     profile: OneBot.GuildServiceProfile
   }
 }
 
 export class QQGuildBot<C extends Context> extends BaseBot<C> {
-  declare parent: OneBotBot<Context>
+  declare parent: NapCatBot<Context>
   hidden = true
 
   constructor(ctx: C, config: QQGuildBot.Config) {

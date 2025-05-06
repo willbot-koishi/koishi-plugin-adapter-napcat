@@ -10,8 +10,10 @@ export * from './cqcode'
 export * from './message'
 export * from './qqguild'
 
-export class OneBotBot<C extends Context, T extends OneBotBot.Config = OneBotBot.Config> extends BaseBot<C, T> {
+export class NapCatBot<C extends Context, T extends NapCatBot.Config = NapCatBot.Config> extends BaseBot<C, T> {
   public guildBot: QQGuildBot<C>
+
+  isNapCat = true
 
   constructor(ctx: C, config: T) {
     super(ctx, config, 'onebot')
@@ -105,7 +107,7 @@ export class OneBotBot<C extends Context, T extends OneBotBot.Config = OneBotBot
   }
 }
 
-export namespace OneBotBot {
+export namespace NapCatBot {
   export interface BaseConfig extends BaseBot.Config {
     selfId: string
     password?: string

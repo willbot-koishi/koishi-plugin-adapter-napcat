@@ -431,7 +431,7 @@ export interface Internal {
   getEssenceMsgList(group_id: id): Promise<EssenceMessage[]>
   getWordSlices(content: string): Promise<string[]>
   ocrImage(image: string): Promise<OcrResult>
-  getGroupMsgHistory(group_id: id, message_seq?: number): Promise<{ messages: Message[] }>
+  getGroupMsgHistory(group_id: id, message_seq?: number, reverse_order?: boolean, count?: number): Promise<{ messages: Message[] }>
   deleteFriend(user_id: id): Promise<void>
   deleteFriendAsync(user_id: id): Promise<void>
   deleteUnidirectionalFriend(user_id: id): Promise<void>
@@ -636,7 +636,7 @@ Internal.define('get_essence_msg_list', 'group_id')
 Internal.define('ocr_image', 'image')
 Internal.defineExtract('get_forward_msg', 'messages', 'message_id')
 Internal.defineExtract('.get_word_slices', 'slices', 'content')
-Internal.define('get_group_msg_history', 'group_id', 'message_seq')
+Internal.define('get_group_msg_history', 'group_id', 'message_seq', 'reverseOrder', 'count')
 Internal.define('set_friend_add_request', 'flag', 'approve', 'remark')
 Internal.define('set_group_add_request', 'flag', 'sub_type', 'approve', 'reason')
 Internal.defineExtract('_get_model_show', 'variants', 'model')
@@ -710,13 +710,3 @@ Internal.define('get_guild_channel_list', 'guild_id', 'no_cache')
 Internal.define('get_guild_member_list', 'guild_id', 'next_token')
 Internal.define('get_guild_member_profile', 'guild_id', 'user_id')
 Internal.defineExtract('send_guild_channel_msg', 'message_id', 'guild_id', 'channel_id', 'message')
-
-// lagrange
-// TODO lagrange 和 gocqhttp 接口并不一致，目前就按照参数多的来写了
-Internal.define('upload_image', 'file')
-Internal.defineExtract('get_private_file_url', 'url', 'user_id', 'file_id', 'file_hash')
-Internal.define('move_group_file', 'group_id', 'file_id', 'parent_directory', 'target_directory')
-// Internal.define('delete_group_file', 'group_id', 'file_id')
-// Internal.define('create_group_file_folder', 'group_id', 'name', 'parent_id')
-Internal.define('delete_group_file_folder', 'group_id', 'folder_id')
-Internal.define('rename_group_file_folder', 'group_id', 'folder_id', 'new_folder_name')

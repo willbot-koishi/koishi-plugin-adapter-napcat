@@ -1,23 +1,24 @@
 {
-  "name": "koishi-plugin-adapter-onebot",
+  "name": "koishi-plugin-adapter-napcat",
   "version": "6.8.0",
-  "description": "OneBot Adapter for Koishi",
+  "description": "NapCat Adapter for Koishi (Based on OneBot)",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
     "lib"
   ],
   "contributors": [
-    "Shigma <shigma10826@gmail.com>"
+    "Shigma <shigma10826@gmail.com>",
+    "ForkKILLET <fork_killet@outlook.com>"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/koishijs/koishi-plugin-adapter-onebot",
+  "homepage": "https://github.com/willbot-koishi/koishi-plugin-adapter-napcat",
   "repository": {
     "type": "git",
-    "url": "https://github.com/koishijs/koishi-plugin-adapter-onebot.git"
+    "url": "https://github.com/willbot-koishi/koishi-plugin-adapter-napcat"
   },
   "bugs": {
-    "url": "https://github.com/koishijs/koishi-plugin-adapter-onebot/issues"
+    "url": "https://github.com/willbot-koishi/koishi-plugin-adapter-napcat/issues"
   },
   "keywords": [
     "bot",
@@ -26,13 +27,14 @@
     "plugin",
     "adapter",
     "onebot",
+    "napcat",
     "im",
     "chat"
   ],
   "koishi": {
     "description": {
-      "en": "OneBot Adapter for Koishi",
-      "zh": "OneBot 适配器"
+      "en": "NapCat Adapter for Koishi",
+      "zh": "NapCat 适配器"
     },
     "service": {
       "implements": [

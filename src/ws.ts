@@ -1,6 +1,6 @@
 import { Adapter, Context, HTTP, Logger, Schema, Time, Universal } from 'koishi'
 import { WebSocketLayer } from '@koishijs/plugin-server'
-import { OneBotBot } from './bot'
+import { NapCatBot } from './bot'
 import { dispatchSession, Response, TimeoutError } from './utils'
 
 interface SharedConfig<T = 'ws' | 'ws-reverse'> {
@@ -8,7 +8,7 @@ interface SharedConfig<T = 'ws' | 'ws-reverse'> {
   responseTimeout?: number
 }
 
-export class WsClient<C extends Context = Context> extends Adapter.WsClient<C, OneBotBot<C, OneBotBot.BaseConfig & WsClient.Options>> {
+export class WsClient<C extends Context = Context> extends Adapter.WsClient<C, NapCatBot<C, NapCatBot.BaseConfig & WsClient.Options>> {
   accept(socket: Universal.WebSocket): void {
     accept(socket, this.bot)
   }
@@ -36,13 +36,13 @@ export namespace WsClient {
 
 const kSocket = Symbol('socket')
 
-export class WsServer<C extends Context> extends Adapter<C, OneBotBot<C, OneBotBot.BaseConfig & WsServer.Options>> {
+export class WsServer<C extends Context> extends Adapter<C, NapCatBot<C, NapCatBot.BaseConfig & WsServer.Options>> {
   static inject = ['server']
 
   public logger: Logger
   public wsServer?: WebSocketLayer
 
-  constructor(ctx: C, bot: OneBotBot<C>) {
+  constructor(ctx: C, bot: NapCatBot<C>) {
     super(ctx)
     this.logger = ctx.logger('onebot')
 
@@ -57,7 +57,7 @@ export class WsServer<C extends Context> extends Adapter<C, OneBotBot<C, OneBotB
       if (!bot) return socket.close(1008, 'invalid x-self-id')
 
       bot[kSocket] = socket
-      accept(socket, bot)
+      accept(socket as Universal.WebSocket, bot)
     })
 
     ctx.on('dispose', () => {
@@ -66,7 +66,7 @@ export class WsServer<C extends Context> extends Adapter<C, OneBotBot<C, OneBotB
     })
   }
 
-  async disconnect(bot: OneBotBot<C>) {
+  async disconnect(bot: NapCatBot<C>) {
     bot[kSocket]?.close()
     bot[kSocket] = null
   }
@@ -87,7 +87,7 @@ export namespace WsServer {
 let counter = 0
 const listeners: Record<number, (response: Response) => void> = {}
 
-export function accept(socket: Universal.WebSocket, bot: OneBotBot<Context, OneBotBot.BaseConfig & SharedConfig>) {
+export function accept(socket: Universal.WebSocket, bot: NapCatBot<Context, NapCatBot.BaseConfig & SharedConfig>) {
   socket.addEventListener('message', ({ data }) => {
     let parsed: any
     data = data.toString()

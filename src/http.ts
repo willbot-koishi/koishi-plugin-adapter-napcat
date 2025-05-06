@@ -1,15 +1,15 @@
 import { Adapter, Context, HTTP, Schema } from 'koishi'
 import {} from '@koishijs/plugin-server'
-import { OneBotBot } from './bot'
+import { NapCatBot } from './bot'
 import { dispatchSession } from './utils'
 import { createHmac } from 'crypto'
 
-export class HttpServer<C extends Context = Context> extends Adapter<C, OneBotBot<C>> {
+export class HttpServer<C extends Context = Context> extends Adapter<C, NapCatBot<C>> {
   static inject = ['server']
 
-  declare bots: OneBotBot<C>[]
+  declare bots: NapCatBot<C>[]
 
-  async fork(ctx: C, bot: OneBotBot<C, OneBotBot.Config & HttpServer.Options>) {
+  async fork(ctx: C, bot: NapCatBot<C, NapCatBot.Config & HttpServer.Options>) {
     super.fork(ctx, bot)
     const config = bot.config
     const { endpoint, token } = config
@@ -28,7 +28,7 @@ export class HttpServer<C extends Context = Context> extends Adapter<C, OneBotBo
     return bot.initialize()
   }
 
-  async connect(bot: OneBotBot<C, OneBotBot.Config & HttpServer.Options>) {
+  async connect(bot: NapCatBot<C, NapCatBot.Config & HttpServer.Options>) {
     const { secret, path = '/onebot' } = bot.config
     this.ctx.server.post(path, (ctx) => {
       if (secret) {

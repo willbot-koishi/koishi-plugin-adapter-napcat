@@ -13,12 +13,12 @@ export class BaseBot<C extends Context = Context, T extends BaseBot.Config = Bas
     return { id: `${PRIVATE_PFX}${userId}`, type: Universal.Channel.Type.DIRECT }
   }
 
-  async getMessage(channelId: string, messageId: string) {
+  async getMessage(_channelId: string, messageId: string) {
     const data = await this.internal.getMsg(messageId)
     return await OneBot.adaptMessage(this, data)
   }
 
-  async deleteMessage(channelId: string, messageId: string) {
+  async deleteMessage(_channelId: string, messageId: string) {
     await this.internal.deleteMsg(messageId)
   }
 
@@ -54,21 +54,29 @@ export class BaseBot<C extends Context = Context, T extends BaseBot.Config = Bas
     await this.internal.deleteFriend(userId)
   }
 
-  async getMessageList(channelId: string, before?: string, direction: Universal.Direction = 'before') {
-    if (direction !== 'before') throw new Error('Unsupported direction.')
-    // include `before` message
-    let list: OneBot.Message[]
-    if (before) {
-      const msg = await this.internal.getMsg(before)
-      if (msg?.message_seq) {
-        list = (await this.internal.getGroupMsgHistory(Number(channelId), msg.message_seq)).messages
-      }
-    } else {
-      list = (await this.internal.getGroupMsgHistory(Number(channelId))).messages
+  async getMessageList(
+    channelId: string,
+    seq?: string,
+    direction: Universal.Direction = 'before',
+    count?: number,
+  ): Promise<Universal.List<Universal.Message>> {
+    if (direction !== 'before' && direction !== 'after') {
+      throw new Error('Unsupported direction.')
     }
 
-    // 从旧到新
-    return { data: await Promise.all(list.map(item => OneBot.adaptMessage(this, item))) }
+    const isReverse = direction === 'before'
+    const { messages } = await this.internal
+      .getGroupMsgHistory(Number(channelId), seq ? Number(seq) : 0, isReverse, count)
+    if (isReverse && seq) messages.pop() // remove the delimiter message
+
+    const adaptedMessages = await Promise.all(
+      messages?.map(message => OneBot.adaptMessage(this, message)),
+    )
+
+    return {
+      data: adaptedMessages,
+      next: adaptedMessages?.[0]?.id,
+    }
   }
 }
 
