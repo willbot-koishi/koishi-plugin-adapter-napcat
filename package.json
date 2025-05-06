@@ -1,6 +1,6 @@
 {
   "name": "koishi-plugin-adapter-napcat",
-  "version": "6.8.0",
+  "version": "6.8.0-napcat.0",
   "description": "NapCat Adapter for Koishi (Based on OneBot)",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
@@ -44,7 +44,8 @@
   },
   "scripts": {
     "build": "atsc -b",
-    "lint": "eslint --ext=ts --cache"
+    "lint": "eslint --ext=ts --cache",
+    "pub": "yarn workspace willbot pub adapter-napcat"
   },
   "devDependencies": {
     "@cordisjs/eslint-config": "^1.1.1",
