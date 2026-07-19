@@ -87,7 +87,7 @@ export namespace WsServer {
 let counter = 0
 const listeners: Record<number, (response: Response) => void> = {}
 
-export function accept(socket: Universal.WebSocket, bot: NapCatBot<Context, NapCatBot.BaseConfig & SharedConfig>) {
+export function accept(socket: Universal.WebSocket, bot: NapCatBot<Context, NapCatBot.Config & SharedConfig>) {
   socket.addEventListener('message', ({ data }) => {
     let parsed: any
     data = data.toString()

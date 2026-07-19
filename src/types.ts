@@ -72,6 +72,7 @@ export interface Message extends MessageId {
   channel_id?: string
   message: string | CQCode[]
   anonymous?: AnonymousInfo
+  emoji_likes_list?: EmojiLikeSummary[]
 }
 
 export interface AnonymousInfo {
@@ -373,6 +374,26 @@ export interface ReactionInfo {
   clicked: boolean
 }
 
+export interface EmojiLikeSummary {
+  emoji_id: string
+  emoji_type: string
+  likes_cnt: string
+}
+
+export interface MessageReaction {
+  emoji_id: string
+  count: number
+}
+
+export interface EmojiLikeUser {
+  user_id: string
+  nick_name: string
+}
+
+export interface EmojiLikeList {
+  emoji_like_list: EmojiLikeUser[]
+}
+
 export interface Payload extends Message {
   time: number
   self_id: number
@@ -395,6 +416,8 @@ export interface Payload extends Message {
   new_info: ChannelInfo
   channel_info: ChannelInfo
   current_reactions: ReactionInfo[]
+  likes: MessageReaction[]
+  is_add: boolean
   file: File
 }
 
@@ -427,6 +450,9 @@ export interface Internal {
   sendGroupSign(group_id: id): Promise<void>
   sendGroupSignAsync(group_id: id): Promise<void>
   getMsg(message_id: id): Promise<Message>
+  setMsgEmojiLike(message_id: id, emoji_id: id, set?: boolean): Promise<void>
+  setMsgEmojiLikeAsync(message_id: id, emoji_id: id, set?: boolean): Promise<void>
+  getEmojiLikes(message_id: id, emoji_id: id, group_id?: id, emoji_type?: string, count?: number): Promise<EmojiLikeList>
   getForwardMsg(message_id: id): Promise<ForwardMessage[]>
   getEssenceMsgList(group_id: id): Promise<EssenceMessage[]>
   getWordSlices(content: string): Promise<string[]>
@@ -632,6 +658,8 @@ Internal.define('delete_essence_msg', 'message_id')
 Internal.define('send_group_sign', 'group_id')
 Internal.define('send_like', 'user_id', 'times')
 Internal.define('get_msg', 'message_id')
+Internal.define('set_msg_emoji_like', 'message_id', 'emoji_id', 'set')
+Internal.define('get_emoji_likes', 'message_id', 'emoji_id', 'group_id', 'emoji_type', 'count')
 Internal.define('get_essence_msg_list', 'group_id')
 Internal.define('ocr_image', 'image')
 Internal.defineExtract('get_forward_msg', 'messages', 'message_id')

@@ -5,6 +5,55 @@ import * as OneBot from './types'
 
 export * from './types'
 
+export type QQReactionType = 'face' | 'emoji'
+
+export interface QQReaction {
+  type: QQReactionType
+  id: string
+}
+
+const QQ_REACTION_PREFIX = /^(face|emoji)\|(.+)$/
+
+/**
+ * Normalizes the Milky-compatible reaction ID while accepting NapCat's raw ID.
+ * NapCat omits the type from reaction notices and uses the same length heuristic
+ * when setting a reaction: QQ faces are short IDs, Unicode emoji are decimal
+ * code points whose IDs are normally longer than three digits.
+ */
+export function decodeQQReactionId(reactionId: string): QQReaction {
+  const match = QQ_REACTION_PREFIX.exec(reactionId)
+  if (match) {
+    return { type: match[1] as QQReactionType, id: match[2] }
+  }
+  return {
+    type: reactionId.length > 3 ? 'emoji' : 'face',
+    id: reactionId,
+  }
+}
+
+export function encodeQQReactionId(reactionId: string) {
+  const { type, id } = decodeQQReactionId(reactionId)
+  return `${type}|${id}`
+}
+
+export function assertQQReactionSettable(reaction: QQReaction) {
+  const inferredType = reaction.id.length > 3 ? 'emoji' : 'face'
+  if (reaction.type === inferredType) return
+  throw new Error(
+    `NapCat cannot set ${reaction.type}|${reaction.id}: its API infers this ID as ${inferredType}.`,
+  )
+}
+
+export function getQQReactionName(reactionId: string) {
+  const { type, id } = decodeQQReactionId(reactionId)
+  if (type === 'face') return qface.get(id)?.QDes.slice(1)
+
+  const codePoint = Number(id)
+  if (!Number.isInteger(codePoint) || codePoint < 0 || codePoint > 0x10FFFF) return
+  if (codePoint >= 0xD800 && codePoint <= 0xDFFF) return
+  return String.fromCodePoint(codePoint)
+}
+
 export const decodeUser = (user: OneBot.AccountInfo): Universal.User => ({
   id: user.tiny_id || user.user_id.toString(),
   name: user.nickname,
@@ -13,10 +62,11 @@ export const decodeUser = (user: OneBot.AccountInfo): Universal.User => ({
   username: user.nickname,
 })
 
+// Koishi 4.18.11 represents member roles as GuildRole objects instead of IDs.
 export const decodeGuildMember = (user: OneBot.SenderInfo): Universal.GuildMember => ({
   user: decodeUser(user),
   nick: user.card,
-  roles: [user.role],
+  roles: user.role ? [{ id: user.role }] : [],
 })
 
 export const adaptQQGuildMemberInfo = (user: OneBot.GuildMemberInfo): Universal.GuildMember => ({
@@ -26,7 +76,7 @@ export const adaptQQGuildMemberInfo = (user: OneBot.GuildMemberInfo): Universal.
     isBot: user.role_name === '机器人',
   },
   name: user.nickname,
-  roles: user.role_name ? [user.role_name] : [],
+  roles: user.role_name ? [{ id: user.role_name, name: user.role_name }] : [],
 })
 
 export const adaptQQGuildMemberProfile = (user: OneBot.GuildMemberProfile): Universal.GuildMember => ({
@@ -36,7 +86,7 @@ export const adaptQQGuildMemberProfile = (user: OneBot.GuildMemberProfile): Univ
     isBot: user.roles?.some(r => r.role_name === '机器人'),
   },
   name: user.nickname,
-  roles: user.roles?.map(r => r.role_name) || [],
+  roles: user.roles?.map(role => ({ id: role.role_id, name: role.role_name })) || [],
 })
 
 export async function adaptMessage(
@@ -264,6 +314,18 @@ export async function adaptSession(bot: BaseBot, data: OneBot.Payload) {
         session.type = 'onebot'
         session.subtype = 'message-reactions-updated'
         break
+      case 'group_msg_emoji_like': {
+        const reaction = data.likes?.[0]
+        if (!reaction) return
+        session.type = data.is_add ? 'reaction-added' : 'reaction-removed'
+        session.subtype = 'group'
+        session.isDirect = false
+        session.event.emoji = {
+          id: encodeQQReactionId(reaction.emoji_id),
+          name: getQQReactionName(reaction.emoji_id),
+        }
+        break
+      }
       case 'channel_created':
         session.type = 'onebot'
         session.subtype = 'channel-created'

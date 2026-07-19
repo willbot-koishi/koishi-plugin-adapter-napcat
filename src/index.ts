@@ -13,6 +13,8 @@ export default NapCatBot
 declare module '@satorijs/core' {
   interface Session {
     onebot?: OneBot.Payload & OneBot.Internal
+    /** @deprecated Retained after its removal from Koishi 4.18.11 for OneBot compatibility. */
+    subsubtype?: string
   }
 }
 

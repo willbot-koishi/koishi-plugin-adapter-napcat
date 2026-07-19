@@ -133,6 +133,14 @@
 ### NapCat 特有 API
 
 - [`onebot.getGroupMsgHistory(..., reverse_order?, count?)`](https://napcat.apifox.cn/226657401e0)：通过 `reverse_order` 参数，可以指定消息获取方向，并以此实现分页获取历史消息；`count` 参数可以指定获取消息条数
+- [`onebot.setMsgEmojiLike()`](https://napcat.apifox.cn/226659104e0)：添加或移除群消息回应
+- [`onebot.getEmojiLikes()`](https://napcat.apifox.cn/410334663e0)：获取指定回应的用户列表
+
+适配器同时为群消息实现了 Koishi 的 `createReaction()`、`deleteReaction()` 和 `getReactionList()`，并将 NapCat 的 `group_msg_emoji_like` 通知转换为标准的 `reaction-added` / `reaction-removed` 事件。`deleteReaction()` 只能移除当前机器人账号自己添加的 reaction。QQ 系统表情和 Unicode emoji 的 ID 分别表示为 `face|<id>` 与 `emoji|<十进制码点>`；调用接口时仍兼容 NapCat 原始 ID。
+
+建议使用 NapCat v4.12.1 或更新版本。启用前应确认部署实例同时支持 `get_emoji_likes`，并会为普通群消息上报 `group_msg_emoji_like`；不同 NapCat 构建和事件过滤配置可能影响这些扩展能力。
+
+NapCat 的通知和设置 API 不携带 reaction 类型，只能按原始 ID 长度推断：不超过三位视为 QQ 系统表情，较长 ID 视为 Unicode emoji。因此短 Unicode 码点（例如 `©` 的 169、`®` 的 174）会与同 ID 的 QQ 系统表情冲突，无法无歧义处理；`getReactionList()` 虽会传入显式查询类型，但不能消除通知与设置阶段的歧义。
 
 ### 频道 API
 

@@ -22,6 +22,40 @@ export class BaseBot<C extends Context = Context, T extends BaseBot.Config = Bas
     await this.internal.deleteMsg(messageId)
   }
 
+  async createReaction(_channelId: string, messageId: string, emojiId: string) {
+    const reaction = OneBot.decodeQQReactionId(emojiId)
+    OneBot.assertQQReactionSettable(reaction)
+    const { id } = reaction
+    await this.internal.setMsgEmojiLike(messageId, id, true)
+  }
+
+  async deleteReaction(_channelId: string, messageId: string, emojiId: string, userId?: string) {
+    if (userId && userId !== this.selfId) {
+      throw new Error('NapCat can only remove reactions created by the current account.')
+    }
+    const reaction = OneBot.decodeQQReactionId(emojiId)
+    OneBot.assertQQReactionSettable(reaction)
+    const { id } = reaction
+    await this.internal.setMsgEmojiLike(messageId, id, false)
+  }
+
+  async getReactionList(channelId: string, messageId: string, emojiId: string, _next?: string) {
+    const { id, type } = OneBot.decodeQQReactionId(emojiId)
+    const { emoji_like_list: reactions } = await this.internal.getEmojiLikes(
+      messageId,
+      id,
+      channelId,
+      type === 'emoji' ? '2' : '1',
+      0,
+    )
+    return {
+      data: reactions.map(({ user_id, nick_name }) => ({
+        id: user_id.toString(),
+        name: nick_name,
+      })),
+    }
+  }
+
   async getLogin() {
     const data = await this.internal.getLoginInfo()
     this.user = OneBot.decodeUser(data)
