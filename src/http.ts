@@ -37,7 +37,9 @@ export class HttpServer<C extends Context = Context> extends Adapter<C, NapCatBo
         if (!signature) return ctx.status = 401
 
         // invalid signature
-        const sig = createHmac('sha1', secret).update(ctx.request.body[Symbol.for('unparsedBody')]).digest('hex')
+        const sig = createHmac('sha1', secret).update(
+          ctx.request.body[Symbol.for('unparsedBody')],
+        ).digest('hex')
         if (signature !== `sha1=${sig}`) return ctx.status = 403
       }
 
@@ -47,6 +49,8 @@ export class HttpServer<C extends Context = Context> extends Adapter<C, NapCatBo
 
       bot.logger.debug('[receive] %o', ctx.request.body)
       dispatchSession(bot, ctx.request.body)
+
+      ctx.status = 204
     })
   }
 }

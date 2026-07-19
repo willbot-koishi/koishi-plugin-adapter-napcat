@@ -1,4 +1,4 @@
-import { h, hyphenate, omit, Universal } from 'koishi'
+import { Context, h, hyphenate, omit, Universal } from 'koishi'
 import * as qface from 'qface'
 import { BaseBot, CQCode } from './bot'
 import * as OneBot from './types'
@@ -89,8 +89,8 @@ export const adaptQQGuildMemberProfile = (user: OneBot.GuildMemberProfile): Univ
   roles: user.roles?.map(role => ({ id: role.role_id, name: role.role_name })) || [],
 })
 
-export async function adaptMessage(
-  bot: BaseBot,
+export async function adaptMessage<C extends Context>(
+  bot: BaseBot<C>,
   data: OneBot.Message,
   message: Universal.Message = {},
   payload: Universal.MessageLike = message,
@@ -212,7 +212,7 @@ export const adaptChannel = (info: OneBot.GroupInfo | OneBot.ChannelInfo): Unive
   }
 }
 
-export async function dispatchSession(bot: BaseBot, data: OneBot.Payload) {
+export async function dispatchSession<C extends Context>(bot: BaseBot<C>, data: OneBot.Payload) {
   if (data.self_tiny_id) {
     // don't dispatch any guild message without guild initialization
     bot = bot['guildBot']
@@ -225,7 +225,7 @@ export async function dispatchSession(bot: BaseBot, data: OneBot.Payload) {
   bot.dispatch(session)
 }
 
-export async function adaptSession(bot: BaseBot, data: OneBot.Payload) {
+export async function adaptSession<C extends Context>(bot: BaseBot<C>, data: OneBot.Payload) {
   const session = bot.session()
   session.selfId = data.self_tiny_id ? data.self_tiny_id : '' + data.self_id
   session.type = data.post_type
@@ -239,6 +239,18 @@ export async function adaptSession(bot: BaseBot, data: OneBot.Payload) {
     session.subtype = data.message_type === 'guild' ? 'group' : data.message_type
     session.isDirect = data.message_type === 'private'
     session.subsubtype = data.message_type
+    if (data.sender?.user_id) session.userId = '' + data.sender.user_id
+    if (data.message_type === 'private') {
+      session.channelId = 'private:' + (
+        data.post_type === 'message_sent' ? data.target_id : data.sender.user_id
+      )
+      if (data.sub_type === 'group' && data.target_id) {
+        session.guildId = '' + data.target_id
+      }
+    } else if (data.message_type === 'group') {
+      session.channelId = '' + data.group_id
+      session.guildId = '' + data.group_id
+    }
     return session
   }
 

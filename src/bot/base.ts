@@ -99,8 +99,20 @@ export class BaseBot<C extends Context = Context, T extends BaseBot.Config = Bas
     }
 
     const isReverse = direction === 'before'
-    const { messages } = await this.internal
-      .getGroupMsgHistory(Number(channelId), seq ? Number(seq) : 0, isReverse, count)
+    const messageSeq = seq ? Number(seq) : 0
+    const messages = channelId.startsWith(PRIVATE_PFX)
+      ? await this.internal.getFriendMsgHistory(
+          channelId.slice(PRIVATE_PFX.length),
+          messageSeq,
+          count,
+          isReverse,
+        )
+      : (await this.internal.getGroupMsgHistory(
+          Number(channelId),
+          messageSeq,
+          isReverse,
+          count,
+        )).messages
     if (isReverse && seq) messages.pop() // remove the delimiter message
 
     const adaptedMessages = await Promise.all(

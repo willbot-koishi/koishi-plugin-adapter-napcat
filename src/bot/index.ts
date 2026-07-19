@@ -1,4 +1,4 @@
-import { Context, noop, Schema, Session } from 'koishi'
+import { Context, noop, Schema, Session, Universal } from 'koishi'
 import { HttpServer } from '../http'
 import { WsClient, WsServer } from '../ws'
 import { QQGuildBot } from './qqguild'
@@ -57,6 +57,14 @@ export class NapCatBot<C extends Context, T extends NapCatBot.Config = NapCatBot
   }
 
   async getChannel(channelId: string) {
+    if (channelId.startsWith('private:')) {
+      const userId = channelId.slice('private:'.length)
+      return {
+        id: channelId,
+        type: Universal.Channel.Type.DIRECT,
+        name: userId,
+      } satisfies Universal.Channel
+    }
     const data = await this.internal.getGroupInfo(channelId)
     return OneBot.adaptChannel(data)
   }

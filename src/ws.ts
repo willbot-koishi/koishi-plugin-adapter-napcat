@@ -87,10 +87,13 @@ export namespace WsServer {
 let counter = 0
 const listeners: Record<number, (response: Response) => void> = {}
 
-export function accept(socket: Universal.WebSocket, bot: NapCatBot<Context, NapCatBot.Config & SharedConfig>) {
-  socket.addEventListener('message', ({ data }) => {
+export function accept<
+  C extends Context,
+  T extends NapCatBot.Config & SharedConfig,
+>(socket: Universal.WebSocket, bot: NapCatBot<C, T>) {
+  socket.addEventListener('message', (event) => {
     let parsed: any
-    data = data.toString()
+    const data = event.data.toString()
     try {
       parsed = JSON.parse(data)
     } catch (error) {
@@ -108,6 +111,7 @@ export function accept(socket: Universal.WebSocket, bot: NapCatBot<Context, NapC
 
   socket.addEventListener('close', () => {
     delete bot.internal._request
+    bot.offline()
   })
 
   bot.internal._request = (action, params) => {
