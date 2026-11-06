@@ -1,9 +1,18 @@
 import { Context, h, hyphenate, omit, Universal } from 'koishi'
 import * as qface from 'qface'
-import { BaseBot, CQCode } from './bot'
+import type { BaseBot } from './bot/base'
+import { CQCode } from './bot/cqcode'
 import * as OneBot from './types'
 
 export * from './types'
+
+export function adaptQQFace(id: string, platform: string) {
+  const name = qface.get(id)?.QDes.slice(1)
+  const imageUrl = qface.getUrl(id)
+  // New QQ faces may not be present in qface's bundled catalog. Preserve the
+  // face ID (including reaction support), but never produce an empty image URL.
+  return h('face', { id, name, platform }, imageUrl ? [h.image(imageUrl)] : [])
+}
 
 export type QQReactionType = 'face' | 'emoji'
 
@@ -119,10 +128,7 @@ export async function adaptMessage<C extends Context>(
       return h('at', { type: 'all' })
     },
     face({ id }) {
-      const name = qface.get(id)?.QDes.slice(1)
-      return h('face', { id, name, platform: bot.platform }, [
-        h.image(qface.getUrl(id)),
-      ])
+      return adaptQQFace(id, bot.platform)
     },
     image(attrs) {
       return h('img', {
