@@ -1,4 +1,4 @@
-name: Build
+name: Check
 
 on:
   push:
@@ -18,7 +18,7 @@ jobs:
       - name: Lint
         run: yarn lint
 
-  build:
+  typecheck:
     runs-on: ubuntu-latest
 
     steps:
@@ -28,5 +28,5 @@ jobs:
         uses: actions/setup-node@v6
       - name: Install
         run: yarn
-      - name: Build
-        run: yarn build
+      - name: Check types
+        run: yarn build:type
