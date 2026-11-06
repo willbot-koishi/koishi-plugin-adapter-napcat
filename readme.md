@@ -47,6 +47,21 @@
 
 接收信息时用于验证的字段，应与 OneBot 的 `secret` 配置保持一致。
 
+## 主动重连
+
+`bot.reconnectNow()` 可立即触发正向 WebSocket 重连，跳过当前自动重连等待。
+该方法同步返回以下状态，不会重启插件、Koishi 或 NapCat：
+
+- `accepted`：已启动连接尝试，不代表连接成功；失败后继续自动重试。
+- `connected`：WebSocket 已打开，不打断现有连接；不保证 QQ 账号在线。
+- `connecting`：正在建立连接，不重复尝试。
+- `stopped`：适配器已停止，不会自动启用。
+- `unsupported`：当前使用 HTTP 或反向 WebSocket，不支持此操作。
+
+如需通过管理指令或独立鉴权的 HTTP 接口触发重连，可使用
+[`koishi-plugin-w-napcat-control`](https://github.com/willbot-koishi/koishi-plugin-w-napcat-control)。
+适配器本身不增加 HTTP 管理接口，也不补发断线期间的历史消息。
+
 ## 内部 API
 
 你可以通过 `bot.internal` 或 `session.onebot` 访问内部 API，参见 [访问内部接口](https://koishi.chat/zh-CN/guide/adapter/bot.html#internal-access)。

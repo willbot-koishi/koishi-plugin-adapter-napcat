@@ -38,11 +38,21 @@ export class NapCatBot<C extends Context, T extends NapCatBot.Config = NapCatBot
     await super.stop()
   }
 
-  async initialize() {
+  /** Request an immediate forward-WebSocket retry without interrupting an open connection. */
+  reconnectNow() {
+    if (!(this.adapter instanceof WsClient)) return 'unsupported' as const
+    return this.adapter.reconnectNow()
+  }
+
+  async initialize(isCurrent = () => true) {
     await Promise.all([
       this.getLogin(),
       this.setupGuildService().catch(noop),
-    ]).then(() => this.online(), error => this.offline(error))
+    ]).then(() => {
+      if (isCurrent()) this.online()
+    }, error => {
+      if (isCurrent()) this.offline(error)
+    })
   }
 
   async setupGuildService() {
