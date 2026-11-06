@@ -1,6 +1,6 @@
 {
   "name": "koishi-plugin-adapter-napcat",
-  "version": "6.9.3-napcat.0",
+  "version": "6.9.3-napcat.1",
   "description": "NapCat Adapter for Koishi (Based on OneBot)",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
