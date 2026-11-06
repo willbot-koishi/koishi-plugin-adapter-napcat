@@ -66,5 +66,8 @@
   },
   "dependencies": {
     "qface": "^1.4.1"
+  },
+  "resolutions": {
+    "@types/koa": "^2.15.2"
   }
 }
