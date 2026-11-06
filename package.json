@@ -43,10 +43,11 @@
     }
   },
   "scripts": {
+    "test": "yarn run -T tsx --require yml-register --test test/*.test.ts",
     "build:type": "atsc -b",
     "lint": "eslint --ext=ts --cache",
-    "pub": "yarn workspace willbot pub adapter-napcat",
-    "build": "yarn workspace willbot build adapter-napcat"
+    "pub": "yarn run -T pub adapter-napcat",
+    "build": "yarn run -T build adapter-napcat"
   },
   "devDependencies": {
     "@cordisjs/eslint-config": "^1.1.1",
